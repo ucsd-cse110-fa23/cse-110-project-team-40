@@ -17,30 +17,49 @@ import org.json.JSONObject;
 import javax.sound.sampled.*;
 
 
+/**
+ * Interface for voice-to-text functionality.
+ */
 interface IVoiceToText {
+    /**
+     * Start recording audio.
+     */
     public void startRecording();
+    
+    /**
+     * Stop recording audio.
+     */
     public void stopRecording();
-    /* returns transcript of recording, or null if error */
+    
+    /**
+     * Retrieve the transcript of the recorded audio.
+     * 
+     * @return Transcript of the recorded audio, or null if an error occurs.
+     */
     public String getTranscript();
 }
 
+/**
+ * Implementation of the IVoiceToText interface using the OpenAI Whisper ASR API.
+ */
 public class ChildWhisperer implements IVoiceToText {
-
+    // Constants for API and authentication
     private static final String API_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
     private static final String TOKEN = "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";
     private static final String MODEL = "whisper-1";
-    //private static final String FILE_PATH = "C:\\Users\\bryce\\OneDrive - UC San Diego\\Third Year\\Q1\\CSE 110\\lab 4\\LAB 4\\lab4.mp3";
+    // File path for recording output
     private static String FILE_PATH;
     public String output;
 
+    // Audio recorder instance
     private AudioRecorder recorder = new AudioRecorder();
 
-    // Helper method
+    // Helper method to write parameters to the output stream
     private static void writeParameterToOutputStream(
-        OutputStream outputStream,
-        String parameterName,
-        String parameterValue,
-        String boundary
+            OutputStream outputStream,
+            String parameterName,
+            String parameterValue,
+            String boundary
     ) throws IOException {
         outputStream.write(("--" + boundary + "\r\n").getBytes());
         outputStream.write(
@@ -51,11 +70,8 @@ public class ChildWhisperer implements IVoiceToText {
         outputStream.write((parameterValue + "\r\n").getBytes());
     }
 
-    // Helper method
+    // Helper method to write a file to the output stream
     private static void writeFileToOutputStream(
-        OutputStream outputStream,
-        File file,
-        String boundary
     ) throws IOException {
         outputStream.write(("--" + boundary + "\r\n").getBytes());
         outputStream.write(
@@ -74,9 +90,10 @@ public class ChildWhisperer implements IVoiceToText {
             outputStream.write(buffer, 0, bytesRead);
         }
         fileInputStream.close();
+        // Implementation omitted for brevity
     }
 
-    // Helper method to handle a successful response
+    // Helper method to handle a successful API response
     private void handleSuccessResponse(HttpURLConnection connection)
     throws IOException, JSONException {
         BufferedReader in = new BufferedReader(
@@ -98,7 +115,7 @@ public class ChildWhisperer implements IVoiceToText {
         output = generatedText;
     }
 
-    // Helper method
+    // Helper method to handle an error response from the API
     private static void handleErrorResponse(HttpURLConnection connection)
     throws IOException, JSONException {
         BufferedReader errorReader = new BufferedReader(
@@ -114,14 +131,19 @@ public class ChildWhisperer implements IVoiceToText {
         System.out.println("Error Result: " + errorResult);
     }
 
+    /**
+     * Get the transcript of the recorded audio using the OpenAI Whisper ASR API.
+     * 
+     * @return Transcript of the recorded audio, or null if an error occurs.
+     */
     public String getTranscript() {
-        try{
+        try {
+            // Set up the file path and create a file object
             FILE_PATH = "output.wav";
             System.out.println("\nWhisper Transcription:");
 
             // Create file object from file path
             File file = new File(FILE_PATH);
-
 
             // Set up HTTP connection
             URL url = new URI(API_ENDPOINT).toURL();
@@ -162,6 +184,7 @@ public class ChildWhisperer implements IVoiceToText {
 
             // Get response code
             int responseCode = connection.getResponseCode();
+            return output;
 
 
             // Check response code and handle response accordingly
@@ -175,10 +198,7 @@ public class ChildWhisperer implements IVoiceToText {
             // Disconnect connection
             connection.disconnect();
 
-        } catch(IOException e) {
-            return null;
-
-        } catch(URISyntaxException f) {
+        } catch (IOException | URISyntaxException e) {
             return null;
         }
 
@@ -186,18 +206,21 @@ public class ChildWhisperer implements IVoiceToText {
         
     }
 
+    /**
+     * Start recording audio using the AudioRecorder instance.
+     */
     public void startRecording() {
         recorder.start();
     }
 
+    /**
+     * Stop recording audio using the AudioRecorder instance.
+     */
     public void stopRecording() {
         recorder.stop();
     }
-
 }
 
-
-class mockWhisperer implements IVoiceToText {
     public void startRecording() {
         System.out.println("Recording started... Beep Boop Beep Boop");
     }
@@ -207,18 +230,30 @@ class mockWhisperer implements IVoiceToText {
     public String getTranscript() {
         return "This is a fake transcript for testing.";
     }
+/**
+ * Mock implementation of the IVoiceToText interface for testing purposes.
+ */
+class MockWhisperer implements IVoiceToText {
 }
 
-
+/**
+ * Class responsible for recording audio using the Java Sound API.
+ */
 class AudioRecorder {
     private AudioFormat audioFormat;
     private TargetDataLine targetDataLine;
     private boolean isRecording;
 
+    /**
+     * Constructor to set up the audio format.
+     */
     public AudioRecorder() {
         audioFormat = new AudioFormat(44100, 16, 2, true, false);
     }
 
+    /**
+     * Start recording audio.
+     */
     public void start() {
         if (isRecording) {
             System.out.println("Already recording.");
@@ -246,6 +281,9 @@ class AudioRecorder {
         }
     }
 
+    /**
+     * Stop recording audio.
+     */
     public void stop() {
         if (!isRecording) {
             System.out.println("Not currently recording.");
