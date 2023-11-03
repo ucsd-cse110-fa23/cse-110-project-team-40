@@ -3,9 +3,9 @@ name: Initial Java CI
 on: [push]
 
 permissions:
-    contents: read
-    checks: write
-    id-token: write
+  contents: read
+  checks: write
+  id-token: write
 
 jobs:
   build:
@@ -19,12 +19,23 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
+
+      - name: Download and add JSON library
+        run: |
+          # You can use wget or curl to download the library JAR file
+          wget -O json-library.jar https://example.com/path/to/json-library.jar
+          # Add the library JAR to the classpath
+          export CLASSPATH=.:json-library.jar
+        working-directory: src/PantryPal
+
       # Get dependencies
-      - name: install dependencies
+      - name: Install dependencies
         run: bash setup_lib.sh
 
-      # build everything 
-      - name: Make 
+      # Build everything
+      - name: Make
         run: make
+
+      # Run unit test
       - name: Run unit test
-        run: make test 
+        run: make test
