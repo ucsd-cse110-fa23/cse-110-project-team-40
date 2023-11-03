@@ -17,7 +17,7 @@ public class Bingus {
     public String makeRecipe(String mealType, String ingredients) {
         try {
             //String prompt = "waht is the velocty in agile development?";
-            String prompt = "Give me a " + mealType + " recipe using the following ingredients: " + ingredients;
+            String prompt = "Give me a " + mealType + " recipe using the following ingredients: " + ingredients + ". Thank you.";
             System.out.println(prompt);
             int maxTokens = 100;
             //int maxTokens = Integer.parseInt();
