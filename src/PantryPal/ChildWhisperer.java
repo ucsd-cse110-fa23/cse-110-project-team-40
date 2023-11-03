@@ -14,6 +14,8 @@ import java.net.URL;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.sound.sampled.*;
+
 
 public class ChildWhisperer {
 
@@ -23,6 +25,8 @@ public class ChildWhisperer {
     //private static final String FILE_PATH = "C:\\Users\\bryce\\OneDrive - UC San Diego\\Third Year\\Q1\\CSE 110\\lab 4\\LAB 4\\lab4.mp3";
     private static String FILE_PATH;
     public String output;
+
+    private AudioRecorder recorder = new AudioRecorder();
 
     // Helper method
     private static void writeParameterToOutputStream(
@@ -102,8 +106,6 @@ public class ChildWhisperer {
         String errorResult = errorResponse.toString();
         System.out.println("Error Result: " + errorResult);
     }
-    
-    public static void main(String[] args) throws IOException, URISyntaxException {}
 
     public String getTranscript(String filePath) {
         try{
@@ -177,4 +179,70 @@ public class ChildWhisperer {
         
     }
 
+    public void startRecording() {
+        recorder.start();
+    }
+
+    public void stopRecording() {
+        recorder.stop();
+    }
+
+}
+
+
+
+
+class AudioRecorder {
+    private AudioFormat audioFormat;
+    private TargetDataLine targetDataLine;
+    private boolean isRecording;
+
+    public AudioRecorder() {
+        audioFormat = new AudioFormat(44100, 16, 2, true, false);
+    }
+
+    public void start() {
+        if (isRecording) {
+            System.out.println("Already recording.");
+            return;
+        }
+
+        try {
+            DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
+            targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
+            targetDataLine.open(audioFormat);
+            targetDataLine.start();
+
+            isRecording = true;
+
+            new Thread(() -> {
+                try {
+                    AudioInputStream audioInputStream = new AudioInputStream(targetDataLine);
+                    AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, new java.io.File("output.wav"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stop() {
+        if (!isRecording) {
+            System.out.println("Not currently recording.");
+            return;
+        }
+
+        try {
+            targetDataLine.stop();
+            targetDataLine.close();
+            isRecording = false;
+            // You can convert the recorded WAV to MP3 using a different library if needed
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    
 }

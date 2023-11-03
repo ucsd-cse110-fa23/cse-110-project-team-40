@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ChildWhisperer",
+            "request": "launch",
+            "mainClass": "PantryPal.ChildWhisperer",
+            "projectName": "cse-110-project-team-40_b0f2ed1"
+        },
+        {
+            "type": "java",
             "name": "Main",
             "request": "launch",
             "mainClass": "PantryPal.PantryPal",
