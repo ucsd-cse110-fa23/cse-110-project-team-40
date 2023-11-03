@@ -9,5 +9,5 @@ cd lib
 curl -O $JUNIT
 curl -O $HAMCREST
 curl -O $OPENJFX
-curl -O $JSON
+curl -O $JSON -L
 unzip $OPENJFX_ZIP
