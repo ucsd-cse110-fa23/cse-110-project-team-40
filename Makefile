@@ -11,8 +11,10 @@ JSON = $(ABSOLUTE_PROJECT_DIR)/lib/json-20231013.jar
 
 # Compile flags
 JFLAGS = --module-path $(OPENJFX) --add-modules javafx.controls,javafx.fxml
-# Classpath for JUNIT and JSON
-JTESTCP = "$(JUNIT):$(HAMCREST):$(JSON)"
+# Classpath for JUNIT
+JTESTCP = "$(JUNIT):$(HAMCREST):."
+# Classpath for JSON
+JCP = "$(JSON)"
 
 # Source directory and testing directories
 SRC_DIR = ./src
@@ -50,7 +52,7 @@ $(TESTCLASSES): $(SRCS) $(TESTSRCS)
 
 $(CLASSES): $(SRCS)
 	@mkdir -p $(@D)
-	$(JAVAC) $(JFLAGS) -cp $(JTESTCP) -d $(OUT_DIR) $^
+	$(JAVAC) $(JFLAGS) -cp $(JCP) -d $(OUT_DIR) $^
 
 # Run the Java application
 run: all
