@@ -17,7 +17,14 @@ import org.json.JSONObject;
 import javax.sound.sampled.*;
 
 
-public class ChildWhisperer {
+interface IVoiceToText {
+    public void startRecording();
+    public void stopRecording();
+    /* returns transcript of recording, or null if error */
+    public String getTranscript();
+}
+
+public class ChildWhisperer implements IVoiceToText {
 
     private static final String API_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
     private static final String TOKEN = "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";
@@ -107,9 +114,9 @@ public class ChildWhisperer {
         System.out.println("Error Result: " + errorResult);
     }
 
-    public String getTranscript(String filePath) {
+    public String getTranscript() {
         try{
-            FILE_PATH = filePath;
+            FILE_PATH = "output.wav";
             System.out.println("\nWhisper Transcription:");
 
             // Create file object from file path
@@ -190,6 +197,17 @@ public class ChildWhisperer {
 }
 
 
+class mockBingus implements IVoiceToText {
+    public void startRecording() {
+        System.out.println("Recording started... Beep Boop Beep Boop");
+    }
+    public void stopRecording() {
+        System.out.println("Recording stopped... YAAAAAAAAY");
+    }
+    public String getTranscript() {
+        return "This is a fake transcript for testing.";
+    }
+}
 
 
 class AudioRecorder {

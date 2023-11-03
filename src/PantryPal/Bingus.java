@@ -8,16 +8,21 @@ import java.net.http.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class Bingus {
+interface IRecipeCreator {
+    /* returns string response, or null if error */
+   public String makeRecipe(String meal, String ingredients);
+}
+
+public class Bingus implements IRecipeCreator {
     private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
     private static final String API_KEY = "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";
     private static final String MODEL = "text-davinci-003";
     public String bingusOutput;
 
-    public String makeRecipe(String mealType, String ingredients) {
+    public String makeRecipe(String meal, String ingredients) {
         try {
             //String prompt = "waht is the velocty in agile development?";
-            String prompt = "Give me a " + mealType + " recipe using the following ingredients: " + ingredients + ". Thank you.";
+            String prompt = "Give me a " + meal + " recipe using the following ingredients: " + ingredients + ". Thank you.";
             System.out.println(prompt);
             int maxTokens = 100;
             //int maxTokens = Integer.parseInt();
@@ -65,3 +70,9 @@ public class Bingus {
 
 }
 
+class mockBingus implements IRecipeCreator {
+    public String makeRecipe(String meal, String ingredients) {
+        return "This is an example of the expected output from chatgpt." + 
+               "\nThese are your inputs: " + meal + " and " + ingredients;
+    }
+}
