@@ -197,7 +197,7 @@ public class ChildWhisperer implements IVoiceToText {
 }
 
 
-class mockBingus implements IVoiceToText {
+class mockWhisperer implements IVoiceToText {
     public void startRecording() {
         System.out.println("Recording started... Beep Boop Beep Boop");
     }
