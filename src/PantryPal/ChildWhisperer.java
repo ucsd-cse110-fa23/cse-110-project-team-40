@@ -72,6 +72,9 @@ public class ChildWhisperer implements IVoiceToText {
 
     // Helper method to write a file to the output stream
     private static void writeFileToOutputStream(
+        OutputStream outputStream,
+        File file,
+        String boundary
     ) throws IOException {
         outputStream.write(("--" + boundary + "\r\n").getBytes());
         outputStream.write(
@@ -184,7 +187,6 @@ public class ChildWhisperer implements IVoiceToText {
 
             // Get response code
             int responseCode = connection.getResponseCode();
-            return output;
 
 
             // Check response code and handle response accordingly
@@ -221,6 +223,10 @@ public class ChildWhisperer implements IVoiceToText {
     }
 }
 
+/**
+ * Mock implementation of the IVoiceToText interface for testing purposes.
+ */
+class MockWhisperer implements IVoiceToText {
     public void startRecording() {
         System.out.println("Recording started... Beep Boop Beep Boop");
     }
@@ -230,10 +236,6 @@ public class ChildWhisperer implements IVoiceToText {
     public String getTranscript() {
         return "This is a fake transcript for testing.";
     }
-/**
- * Mock implementation of the IVoiceToText interface for testing purposes.
- */
-class MockWhisperer implements IVoiceToText {
 }
 
 /**
