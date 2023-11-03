@@ -22,8 +22,8 @@ jobs:
 
       - name: Download and add JSON library
         run: |
-          # You can use wget or curl to download the library JAR file
-          wget -O json-library.jar https://example.com/path/to/json-library.jar
+          # Download the JSON library JAR file
+          wget -O json-library.jar https://search.maven.org/remotecontent?filepath=org/json/json/20231013/json-20231013.jar
           # Add the library JAR to the classpath
           export CLASSPATH=.:json-library.jar
         working-directory: src/PantryPal
