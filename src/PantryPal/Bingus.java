@@ -8,35 +8,56 @@ import java.net.http.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * An interface for creating recipes.
+ */
 interface IRecipeCreator {
-    /* returns string response, or null if error */
-   public String makeRecipe(String meal, String ingredients);
+    /**
+     * Method for generating a recipe.
+     *
+     * @param meal The type of meal for the recipe.
+     * @param ingredients The list of ingredients for the recipe.
+     * @return A string response containing the generated recipe, or null if there is an error.
+     */
+    public String makeRecipe(String meal, String ingredients);
 }
 
+/**
+ * The Bingus class implements the IRecipeCreator interface and provides a way to generate recipes
+ * using the OpenAI API.
+ */
 public class Bingus implements IRecipeCreator {
+    // Constants for API access
     private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
     private static final String API_KEY = "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";
     private static final String MODEL = "text-davinci-003";
-    public String bingusOutput;
+    public String bingusOutput;  // Store the generated recipe
 
+    /**
+     * Generates a recipe based on the given meal and ingredients.
+     *
+     * @param meal The type of meal for the recipe.
+     * @param ingredients The list of ingredients for the recipe.
+     * @return A string containing the generated recipe, or null if there is an error.
+     */
     public String makeRecipe(String meal, String ingredients) {
         try {
-            //String prompt = "waht is the velocty in agile development?";
+            // Create a prompt for generating a recipe based on the meal and ingredients
             String prompt = "Give me a " + meal + " recipe using the following ingredients: " + ingredients + ". Thank you.";
             System.out.println(prompt);
-            int maxTokens = 100;
-            //int maxTokens = Integer.parseInt();
 
+            // Maximum number of tokens for the response
+            int maxTokens = 100;
+
+            // Create a JSON request body
             JSONObject requestBody = new JSONObject();
             requestBody.put("model", MODEL);
             requestBody.put("prompt", prompt);
             requestBody.put("max_tokens", maxTokens);
             requestBody.put("temperature", 1.0);
 
-
             // Create the HTTP Client
             HttpClient client = HttpClient.newHttpClient();
-
 
             // Create the request object
             HttpRequest request = HttpRequest
@@ -47,14 +68,13 @@ public class Bingus implements IRecipeCreator {
             .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
             .build();
 
-
             // Send the request and receive the response
             HttpResponse<String> responseBody = client.send(
             request,
             HttpResponse.BodyHandlers.ofString()
             );
 
-            // parse
+            // Parse the JSON response
             JSONObject responseJson = new JSONObject(responseBody.body());
             JSONArray choices = responseJson.getJSONArray("choices");
             String generatedText = choices.getJSONObject(0).getString("text");
@@ -62,15 +82,25 @@ public class Bingus implements IRecipeCreator {
 
         } catch(Exception e) {
             // How can u possibly screw this up HmmHMHmmMMMmMHMmmmMmMMmmmm 🤔
-            return null;
+            return null;  // Return null in case of an error
         }
 
         return bingusOutput;
     }
-
 }
 
+/**
+ * The mockBingus class implements the IRecipeCreator interface and provides a mock implementation
+ * for testing purposes.
+ */
 class mockBingus implements IRecipeCreator {
+    /**
+     * A mock implementation of the makeRecipe method.
+     *
+     * @param meal The type of meal for the mock recipe.
+     * @param ingredients The list of ingredients for the mock recipe.
+     * @return A string containing a mock recipe output.
+     */
     public String makeRecipe(String meal, String ingredients) {
         return "This is an example of the expected output from chatgpt." + 
                "\nThese are your inputs: " + meal + " and " + ingredients;
