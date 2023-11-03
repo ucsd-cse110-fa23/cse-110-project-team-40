@@ -12,7 +12,7 @@ JSON = $(ABSOLUTE_PROJECT_DIR)/lib/json-20231013.jar
 # Compile flags
 JFLAGS = --module-path $(OPENJFX) --add-modules javafx.controls,javafx.fxml
 # Classpath for JUNIT
-JTESTCP = "$(JUNIT):$(HAMCREST):."
+JTESTCP = "$(JUNIT):$(HAMCREST):$(JSON):."
 # Classpath for JSON
 JCP = "$(JSON)"
 
