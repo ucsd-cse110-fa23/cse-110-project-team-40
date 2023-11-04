@@ -11,13 +11,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.TargetDataLine;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,7 +18,7 @@ import org.json.JSONObject;
 /**
  * Interface for voice-to-text functionality.
  */
-interface IVoiceToText {
+interface VoiceToText {
     /**
      * Start recording audio.
      */
@@ -45,9 +38,9 @@ interface IVoiceToText {
 }
 
 /**
- * Implementation of the IVoiceToText interface using the OpenAI Whisper ASR API.
+ * Implementation of the VoiceToText interface using the OpenAI Whisper ASR API.
  */
-public class WhisperBot implements IVoiceToText {
+public class WhisperBot implements VoiceToText {
     // Constants for API and authentication
     private static final String API_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
     private static final String TOKEN = "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";
@@ -60,7 +53,7 @@ public class WhisperBot implements IVoiceToText {
     private AudioRecorder recorder = new AudioRecorder();
 
     // Helper method to write parameters to the output stream
-    private static void writeParameterToOutputStream(
+    public static void writeParameterToOutputStream(
             OutputStream outputStream,
             String parameterName,
             String parameterValue,
@@ -76,7 +69,7 @@ public class WhisperBot implements IVoiceToText {
     }
 
     // Helper method to write a file to the output stream
-    private static void writeFileToOutputStream(
+    public static void writeFileToOutputStream(
         OutputStream outputStream,
         File file,
         String boundary
@@ -102,7 +95,7 @@ public class WhisperBot implements IVoiceToText {
     }
 
     // Helper method to handle a successful API response
-    private void handleSuccessResponse(HttpURLConnection connection)
+    public void handleSuccessResponse(HttpURLConnection connection)
     throws IOException, JSONException {
         BufferedReader in = new BufferedReader(
             new InputStreamReader(connection.getInputStream())
@@ -124,7 +117,7 @@ public class WhisperBot implements IVoiceToText {
     }
 
     // Helper method to handle an error response from the API
-    private static void handleErrorResponse(HttpURLConnection connection)
+    public static void handleErrorResponse(HttpURLConnection connection)
     throws IOException, JSONException {
         BufferedReader errorReader = new BufferedReader(
             new InputStreamReader(connection.getErrorStream())
@@ -229,9 +222,9 @@ public class WhisperBot implements IVoiceToText {
 }
 
 /**
- * Mock implementation of the IVoiceToText interface for testing purposes.
+ * Mock implementation of the VoiceToText interface for testing purposes.
  */
-class MockWhisperer implements IVoiceToText {
+class MockWhisperer implements VoiceToText {
     // Instance variable for storing the mock transcript
     private String mockTranscript;
     
@@ -270,69 +263,3 @@ class MockWhisperer implements IVoiceToText {
     }
 }
 
-/**
- * Class responsible for recording audio using the Java Sound API.
- */
-class AudioRecorder {
-    private AudioFormat audioFormat;
-    private TargetDataLine targetDataLine;
-    private boolean isRecording;
-
-    /**
-     * Constructor to set up the audio format.
-     */
-    public AudioRecorder() {
-        audioFormat = new AudioFormat(44100, 16, 2, true, false);
-    }
-
-    /**
-     * Start recording audio.
-     */
-    public void start() {
-        if (isRecording) {
-            System.out.println("Already recording.");
-            return;
-        }
-
-        try {
-            DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
-            targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-            targetDataLine.open(audioFormat);
-            targetDataLine.start();
-
-            isRecording = true;
-
-            new Thread(() -> {
-                try {
-                    AudioInputStream audioInputStream = new AudioInputStream(targetDataLine);
-                    AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, new java.io.File("output.wav"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Stop recording audio.
-     */
-    public void stop() {
-        if (!isRecording) {
-            System.out.println("Not currently recording.");
-            return;
-        }
-
-        try {
-            targetDataLine.stop();
-            targetDataLine.close();
-            isRecording = false;
-            // You can convert the recorded WAV to MP3 using a different library if needed
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    
-}

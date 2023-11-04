@@ -11,7 +11,7 @@ import org.json.JSONObject;
 /**
  * An interface for creating recipes.
  */
-interface IRecipeCreator {
+interface RecipeCreator {
     /**
      * Method for generating a recipe.
      *
@@ -23,10 +23,10 @@ interface IRecipeCreator {
 }
 
 /**
- * The ChatGPTBot class implements the IRecipeCreator interface and provides a way to generate recipes
+ * The ChatGPTBot class implements the RecipeCreator interface and provides a way to generate recipes
  * using the OpenAI API.
  */
-public class ChatGPTBot implements IRecipeCreator {
+public class ChatGPTBot implements RecipeCreator {
     // Constants for API access
     private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
     private static final String API_KEY = "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";
@@ -90,10 +90,10 @@ public class ChatGPTBot implements IRecipeCreator {
 }
 
 /**
- * The mockChatGPTBot class implements the IRecipeCreator interface and provides a mock implementation
+ * The mockChatGPTBot class implements the RecipeCreator interface and provides a mock implementation
  * for testing purposes.
  */
-class mockChatGPTBot implements IRecipeCreator {
+class mockChatGPTBot implements RecipeCreator {
     // Instance variables
     private String mockMeal;
     private String mockIngredients;
