@@ -94,6 +94,9 @@ public class ChatGPTBot implements IRecipeCreator {
  * for testing purposes.
  */
 class mockChatGPTBot implements IRecipeCreator {
+    // Instance variables
+    private String mockMeal;
+    private String mockIngredients;
     /**
      * A mock implementation of the makeRecipe method.
      *
@@ -102,7 +105,19 @@ class mockChatGPTBot implements IRecipeCreator {
      * @return A string containing a mock recipe output.
      */
     public String makeRecipe(String meal, String ingredients) {
-        return "This is an example of the expected output from chatgpt." + 
+        return "This is an example of the expected output from ChatGPT." + 
                "\nThese are your inputs: " + meal + " and " + ingredients;
     }
+
+    /**
+ * Sets the mockMeal and mockIngredients instance variables.
+ *
+ * @param mockMeal The type of mock meal to be set.
+ * @param mockIngredients The list of mock ingredients to be set.
+ */
+    public void setOutput(String mockMeal, String mockIngredients) {
+        this.mockMeal = mockMeal;
+        this.mockIngredients = mockIngredients;
+    }
+
 }

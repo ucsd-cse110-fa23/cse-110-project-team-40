@@ -232,14 +232,41 @@ public class WhisperBot implements IVoiceToText {
  * Mock implementation of the IVoiceToText interface for testing purposes.
  */
 class MockWhisperer implements IVoiceToText {
+    // Instance variable for storing the mock transcript
+    private String mockTranscript;
+    
+    /**
+     * Starts the recording process.
+     * Prints a message to the console to simulate the start of a recording.
+     */
     public void startRecording() {
         System.out.println("Recording started... Beep Boop Beep Boop");
     }
+    
+    /**
+     * Stops the recording process.
+     * Prints a message to the console to simulate the end of a recording.
+     */
     public void stopRecording() {
         System.out.println("Recording stopped... YAAAAAAAAY");
     }
+    
+    /**
+     * Returns a mock transcript for testing purposes.
+     *
+     * @return A string containing a fake transcript.
+     */
     public String getTranscript() {
         return "This is a fake transcript for testing.";
+    }
+    
+    /**
+     * Sets the mockTranscript instance variable.
+     *
+     * @param mockTranscript The mock transcript to be set.
+     */
+    public void setOutput(String mockTranscript) {
+        this.mockTranscript = mockTranscript;
     }
 }
 
