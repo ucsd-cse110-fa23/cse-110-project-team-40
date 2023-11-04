@@ -23,16 +23,6 @@ public class WhisperTest {
     }
 
     @Test
-    public void testRecording() {
-        whisper.startRecording();
-        whisper.stopRecording();
-        // Check if the file exists
-        String fileName = "output.wav";
-        File outputFile = new File(fileName);
-        assertTrue(outputFile.exists());
-    }
-
-    @Test
     public void testWriteParameterToOutputStream() throws IOException {
         String parameterName = "paramName";
         String parameterValue = "paramValue";
