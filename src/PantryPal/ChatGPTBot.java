@@ -23,15 +23,15 @@ interface IRecipeCreator {
 }
 
 /**
- * The Bingus class implements the IRecipeCreator interface and provides a way to generate recipes
+ * The ChatGPTBot class implements the IRecipeCreator interface and provides a way to generate recipes
  * using the OpenAI API.
  */
-public class Bingus implements IRecipeCreator {
+public class ChatGPTBot implements IRecipeCreator {
     // Constants for API access
     private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
     private static final String API_KEY = "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";
     private static final String MODEL = "text-davinci-003";
-    public String bingusOutput;  // Store the generated recipe
+    public String ChatGPTBotOutput;  // Store the generated recipe
 
     /**
      * Generates a recipe based on the given meal and ingredients.
@@ -78,22 +78,22 @@ public class Bingus implements IRecipeCreator {
             JSONObject responseJson = new JSONObject(responseBody.body());
             JSONArray choices = responseJson.getJSONArray("choices");
             String generatedText = choices.getJSONObject(0).getString("text");
-            bingusOutput = generatedText;
+            ChatGPTBotOutput = generatedText;
 
         } catch(Exception e) {
             // How can u possibly screw this up HmmHMHmmMMMmMHMmmmMmMMmmmm 🤔
             return null;  // Return null in case of an error
         }
 
-        return bingusOutput;
+        return ChatGPTBotOutput;
     }
 }
 
 /**
- * The mockBingus class implements the IRecipeCreator interface and provides a mock implementation
+ * The mockChatGPTBot class implements the IRecipeCreator interface and provides a mock implementation
  * for testing purposes.
  */
-class mockBingus implements IRecipeCreator {
+class mockChatGPTBot implements IRecipeCreator {
     /**
      * A mock implementation of the makeRecipe method.
      *

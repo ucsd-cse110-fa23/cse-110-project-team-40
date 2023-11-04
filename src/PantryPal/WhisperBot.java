@@ -11,10 +11,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.TargetDataLine;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import javax.sound.sampled.*;
 
 
 /**
@@ -42,7 +47,7 @@ interface IVoiceToText {
 /**
  * Implementation of the IVoiceToText interface using the OpenAI Whisper ASR API.
  */
-public class ChildWhisperer implements IVoiceToText {
+public class WhisperBot implements IVoiceToText {
     // Constants for API and authentication
     private static final String API_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
     private static final String TOKEN = "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";
