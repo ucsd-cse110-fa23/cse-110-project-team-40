@@ -55,7 +55,8 @@ class HttpRequestModel implements HttpModel {
       }
     } catch (IOException ex) {
       return false;
-      
+    }
+  }
   public String performRawRequest(String method, InputStream in) {
     // Implement your HTTP request logic here and return the response
     try {
