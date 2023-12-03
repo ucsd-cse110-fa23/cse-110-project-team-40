@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import utils.Recipe;
 
-interface InteractiveRecipeMaker {
+interface InteractiveRecipeMaker extends Observer {
   /** get recipe if created, returns null otherwise */
   public Recipe getRecipe();
 
@@ -24,13 +24,23 @@ interface InteractiveRecipeMaker {
 
 class NewRecipeAPIFactory implements HttpUserAPIFactory {
   private RecipeCreator creator;
+  private Map<String, WhisperSubject> perUserWhisperSubject;
 
-  NewRecipeAPIFactory(RecipeCreator creator) {
+  NewRecipeAPIFactory(RecipeCreator creator, Map<String, WhisperSubject> perUserWhisperSubject) {
+    this.perUserWhisperSubject = perUserWhisperSubject;
     this.creator = creator;
   }
 
   public HttpAPI makeAPI(String username) {
-    return new NewRecipeAPI(new NewRecipeCreator(creator));
+    InteractiveRecipeMaker newRecipeCreator = new NewRecipeCreator(creator);
+    WhisperSubject whisperSubject = perUserWhisperSubject.get(username);
+    if (whisperSubject == null) {
+      whisperSubject = new WhisperSubject();
+      perUserWhisperSubject.put(username, whisperSubject);
+    }
+    System.err.println("NewRecipeFactory subject: " + whisperSubject.toString());
+    whisperSubject.addObserver(newRecipeCreator);
+    return new NewRecipeAPI(newRecipeCreator);
   }
 }
 

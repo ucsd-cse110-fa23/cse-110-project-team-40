@@ -3,6 +3,7 @@ package server;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 import javafx.event.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
@@ -15,6 +16,11 @@ public class NewRecipeCreator implements InteractiveRecipeMaker {
   RecipeCreator recipeCreator;
   public List<String> prompts;
   private Recipe recipe;
+
+  public void update(Observable o, Object whisperData) {
+    System.err.println("NewRecipeCreator updated");
+    readResponse((String) whisperData);
+  }
 
   NewRecipeCreator(RecipeCreator recipeCreator) {
     this.recipeCreator = recipeCreator;

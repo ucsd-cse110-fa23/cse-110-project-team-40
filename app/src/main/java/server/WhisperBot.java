@@ -1,9 +1,8 @@
-package PantryPal;
+package server;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -14,29 +13,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import utils.AudioRecorder;
 import utils.ConfigReader;
+import utils.VoiceToText;
 
-/** Interface for voice-to-text functionality. */
-interface VoiceToText {
-  public void startRecording();
-
-  public void stopRecording();
-
-  public String getTranscript();
-}
-
-/** Implementation of the VoiceToText interface using the OpenAI Whisper ASR API. */
-public class WhisperBot implements VoiceToText {
+public class WhisperBot implements ServerVoiceToText {
   private static final String API_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
   private static final String MODEL = "whisper-1";
-  private static final String filePath = "output.wav";
   private String token;
-  private String output;
-  private AudioRecorder recorder;
 
   public WhisperBot() {
     ConfigReader configReader = new ConfigReader();
     token = configReader.getOpenAiApiKey();
-    recorder = new AudioRecorder();
   }
 
   // Helper method to write parameters to the output stream
@@ -50,26 +36,20 @@ public class WhisperBot implements VoiceToText {
   }
 
   // Helper method to write a file to the output stream
-  public static void writeFileToOutputStream(OutputStream outputStream, File file, String boundary)
-      throws IOException {
+  public static void writeInputToOutputStream(
+      OutputStream outputStream, InputStream inputStream, String boundary) throws IOException {
     outputStream.write(("--" + boundary + "\r\n").getBytes());
     outputStream.write(
-        ("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"\r\n")
+        ("Content-Disposition: form-data; name=\"file\"; filename=\""
+                + AudioRecorder.filePath
+                + "\"\r\n")
             .getBytes());
     outputStream.write(("Content-Type: audio/mpeg\r\n\r\n").getBytes());
-
-    FileInputStream fileInputStream = new FileInputStream(file);
-    byte[] buffer = new byte[1024];
-    int bytesRead;
-    while ((bytesRead = fileInputStream.read(buffer)) != -1) {
-      outputStream.write(buffer, 0, bytesRead);
-    }
-    fileInputStream.close();
-    // Implementation omitted for brevity
+    inputStream.transferTo(outputStream);
   }
 
   // Helper method to handle a successful API response
-  public void handleSuccessResponse(HttpURLConnection connection)
+  public String handleSuccessResponse(HttpURLConnection connection)
       throws IOException, JSONException {
     BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
     String inputLine;
@@ -82,8 +62,7 @@ public class WhisperBot implements VoiceToText {
     JSONObject responseJson = new JSONObject(response.toString());
 
     String generatedText = responseJson.getString("text");
-
-    output = generatedText;
+    return generatedText;
   }
 
   // Helper method to handle an error response from the API
@@ -107,8 +86,18 @@ public class WhisperBot implements VoiceToText {
    * @return Transcript of the recorded audio, or null if an error occurs.
    */
   public String getTranscript() {
-    try {
+    AudioRecorder recorder = new AudioRecorder();
+    InputStream in = recorder.getAudioInStream();
+    if (in != null) {
+      return getTranscript(in);
+    } else {
+      return null;
+    }
+  }
 
+  public String getTranscript(InputStream voiceData) {
+    String output = null;
+    try {
       // Set up HTTP connection
       URL url = new URI(API_ENDPOINT).toURL();
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -125,10 +114,9 @@ public class WhisperBot implements VoiceToText {
 
       // Write model parameter to request body
       writeParameterToOutputStream(outputStream, "model", MODEL, boundary);
-      // Open file
-      File file = new File(filePath);
+
       // Write file parameter to request body
-      writeFileToOutputStream(outputStream, file, boundary);
+      writeInputToOutputStream(outputStream, voiceData, boundary);
 
       // Write closing boundary to request body
       outputStream.write(("\r\n--" + boundary + "--\r\n").getBytes());
@@ -142,7 +130,7 @@ public class WhisperBot implements VoiceToText {
 
       // Check response code and handle response accordingly
       if (responseCode == HttpURLConnection.HTTP_OK) {
-        handleSuccessResponse(connection);
+        output = handleSuccessResponse(connection);
       } else {
         handleErrorResponse(connection);
       }
@@ -154,20 +142,6 @@ public class WhisperBot implements VoiceToText {
       return null;
     }
     return output;
-  }
-
-  public String getOutput() {
-    return output;
-  }
-
-  /** Start recording audio using the AudioRecorder instance. */
-  public void startRecording() {
-    recorder.start();
-  }
-
-  /** Stop recording audio using the AudioRecorder instance. */
-  public void stopRecording() {
-    recorder.stop();
   }
 }
 

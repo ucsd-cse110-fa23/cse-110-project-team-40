@@ -1,5 +1,9 @@
+/* Code originally adapted from lab5 */
 package utils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -12,6 +16,7 @@ public class AudioRecorder {
   private AudioFormat audioFormat;
   private TargetDataLine targetDataLine;
   private boolean isRecording;
+  public static final String filePath = "output.wav";
 
   /** Constructor to set up the audio format. */
   public AudioRecorder() {
@@ -20,6 +25,23 @@ public class AudioRecorder {
 
   public boolean isRecording() {
     return isRecording;
+  }
+
+  /**
+   * get InputStream for audio file created by recorder
+   *
+   * @return Input stream for audio file, null if I/O err
+   */
+  public InputStream getAudioInStream() {
+    InputStream in;
+    try {
+      File file = new File(filePath);
+      in = new FileInputStream(file);
+      return in;
+    } catch (Exception e) {
+      System.err.println("failed opening file " + filePath);
+      return null;
+    }
   }
 
   public void start() {
@@ -42,7 +64,7 @@ public class AudioRecorder {
                 try {
                   AudioInputStream audioInputStream = new AudioInputStream(targetDataLine);
                   AudioSystem.write(
-                      audioInputStream, AudioFileFormat.Type.WAVE, new java.io.File("output.wav"));
+                      audioInputStream, AudioFileFormat.Type.WAVE, new java.io.File(filePath));
                 } catch (Exception e) {
                   e.printStackTrace();
                 }

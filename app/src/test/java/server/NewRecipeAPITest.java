@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Observable;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ class InteractiveRecipeMakerStub implements InteractiveRecipeMaker {
   List<String> prompts = new ArrayList<String>();
   String response;
   boolean shouldThrowException = false;
+  String requestObserved;
 
   public Recipe getRecipe() {
     return recipe;
@@ -33,6 +35,10 @@ class InteractiveRecipeMakerStub implements InteractiveRecipeMaker {
   public void readResponse(String response) throws IllegalArgumentException {
     this.response = response;
     if (shouldThrowException) throw new IllegalArgumentException("example exception");
+  }
+
+  public void update(Observable o, Object data) {
+    requestObserved = (String) data;
   }
 }
 

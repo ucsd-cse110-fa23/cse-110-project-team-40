@@ -4,6 +4,7 @@ package PantryPal;
 
 import java.io.*;
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -19,6 +20,8 @@ interface HttpModel {
   public boolean tryConnect();
 
   public String performRequest(String method, String query, String request);
+
+  public String performRawRequest(String method, InputStream in);
 }
 
 class HttpRequestModel implements HttpModel {
@@ -39,26 +42,44 @@ class HttpRequestModel implements HttpModel {
       URL url = new URL(urlString);
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
       conn.setRequestMethod("GET");
-      conn.connect(); // Open a connection to the server
+      conn.connect();
 
       int responseCode = conn.getResponseCode();
       // Check if the response code indicates a successful connection
       if (responseCode == HttpURLConnection.HTTP_OK
           || responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
-        // The server is reachable, even if the specific page/resource is not found
         return true;
       } else {
         // Server returned an error response code
         return false;
       }
     } catch (IOException ex) {
-      // An IOException is thrown if there is a network error or the server is unreachable
-      System.err.println("Error: " + ex.getMessage());
-      // System.err.println(\"Error: \" + ex.getMessage());
-      if (ex.getMessage().contains("Connection refused: connect")) {
-        System.err.println("Server Problem!");
-      }
       return false;
+      
+  public String performRawRequest(String method, InputStream in) {
+    // Implement your HTTP request logic here and return the response
+    try {
+      if (!method.equals("POST") && !method.equals("PUT")) {
+        throw new IllegalArgumentException("must call with post or put");
+      }
+      URL url = new URI(urlString).toURL();
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn.setRequestMethod(method);
+      conn.setDoOutput(true);
+      OutputStream out = conn.getOutputStream();
+
+      in.transferTo(out);
+      out.flush();
+      out.close();
+
+      BufferedReader fromServer = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      String response = fromServer.readLine();
+      fromServer.close();
+      System.out.println("Response :" + response);
+      return response;
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      return "Error: " + ex.getMessage();
     }
   }
 

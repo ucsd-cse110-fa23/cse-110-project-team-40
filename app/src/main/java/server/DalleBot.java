@@ -1,5 +1,6 @@
-package PantryPal;
+package server;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -24,9 +25,15 @@ interface ImageGenerator {
 public class DalleBot implements ImageGenerator {
   private static final String API_ENDPOINT = "https://api.openai.com/v1/images/generations";
   private static final String MODEL = "dall-e-2";
-  private static String token;
+  private static final String basePath = "out/PantryPal/recipeImages/";
+  private String token;
+  private String username;
+  private String directory;
 
-  public DalleBot() {
+  public DalleBot(String bdirectory) {
+    this.directory = directory;
+    this.username = username;
+    directory = basePath + username + "/";
     ConfigReader configReader = new ConfigReader();
     token = configReader.getOpenAiApiKey();
   }
@@ -45,8 +52,12 @@ public class DalleBot implements ImageGenerator {
     return imagePath;
   }
 
+  public void makeDirectory() {
+    new File(directory).mkdirs();
+  }
+
   public String getImagePath(String recipeName) {
-    String imagePath = "out/PantryPal/recipeImages/" + recipeName + ".jpg";
+    String imagePath = directory + recipeName + ".jpg";
     // remove special characters from recipe name, change spaces to underscores
     imagePath = recipeName.replaceAll("[^a-zA-Z0-9]", "_");
     return imagePath;

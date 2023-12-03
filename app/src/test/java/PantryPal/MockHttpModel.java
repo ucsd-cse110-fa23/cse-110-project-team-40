@@ -1,11 +1,14 @@
 package PantryPal;
 
+import java.io.InputStream;
+
 /** Mock HttpModel for testing */
 public class MockHttpModel implements HttpModel {
   public String mockResponse;
   public String method;
   public String query;
   public String request;
+  public InputStream in;
 
   @Override
   public boolean tryConnect() {
@@ -23,6 +26,13 @@ public class MockHttpModel implements HttpModel {
     this.method = method;
     this.query = query;
     this.request = request;
+    return this.mockResponse;
+  }
+
+  @Override
+  public String performRawRequest(String method, InputStream in) {
+    this.in = in;
+    this.method = method;
     return this.mockResponse;
   }
 

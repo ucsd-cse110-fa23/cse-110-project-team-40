@@ -102,8 +102,8 @@ class RecipeDetailUI extends VBox {
   protected TextArea descriptionField;
   protected Label mealTypeField;
   protected ImageView imageView;
-  protected DalleBot dalleBot;
-  RecipeDetailModel recipeDetailModel;
+  private RecipeDetailModel recipeDetailModel;
+  private ImageModel imageModel;
 
   public void format() {
     /* format title field */
@@ -127,30 +127,21 @@ class RecipeDetailUI extends VBox {
 
     /* format recipe image */
     try {
-      String imagePath = dalleBot.getImagePath(recipe.getTitle());
-      Image image = new Image(new FileInputStream(imagePath));
+      Image image = imageModel.getImage(recipe.getTitle());
       imageView.setImage(image);
       imageView.setFitWidth(200); // Set preferred width
       imageView.setFitHeight(200); // Set preferred height
       imageView.setPreserveRatio(true);
-    } catch (FileNotFoundException e) {
-      try {
-        String imagePath = dalleBot.generateImage(recipe.getTitle());
-        Image image = new Image(new FileInputStream(imagePath));
-        imageView.setImage(image);
-        imageView.setFitWidth(200); // Set preferred width
-        imageView.setFitHeight(200); // Set preferred height
-        imageView.setPreserveRatio(true);
-      } catch (IOException ex) {
-        System.err.println("Image file generation failed: " + e.getMessage());
-      }
-      // Optionally set a placeholder image or handle the error
+    } catch (Exception e) {
+      System.err.println("Image file generation failed: " + e.getMessage());
     }
+    // Optionally set a placeholder image or handle the error
   }
 
-  RecipeDetailUI(Recipe recipe, RecipeDetailModel recipeDetailModel) {
+  RecipeDetailUI(Recipe recipe, RecipeDetailModel recipeDetailModel, ImageModel imageModel) {
     this.recipe = recipe;
     this.recipeDetailModel = recipeDetailModel;
+    this.imageModel = imageModel;
 
     // Initialize title and description fields
     titleField = new Label();
@@ -160,8 +151,6 @@ class RecipeDetailUI extends VBox {
     mealTypeField = new Label();
     mealTypeField.setText(recipe.getMealType());
     imageView = new ImageView();
-
-    dalleBot = new DalleBot();
 
     this.format();
     this.getChildren().add(titleField);

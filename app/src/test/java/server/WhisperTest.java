@@ -1,4 +1,4 @@
-package PantryPal;
+package server;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.AudioRecorder;
 
 public class WhisperTest {
   WhisperBot whisper;
@@ -42,16 +43,19 @@ public class WhisperTest {
   }
 
   @Test
-  public void testWriteFileToOutputStream() throws IOException {
+  public void testWriteInputToOutputStream() throws IOException {
     String boundary = "boundary";
     File testFile = new File("src/test/java/PantryPal/testfile.txt");
 
-    WhisperBot.writeFileToOutputStream(outputStream, testFile, boundary);
+    WhisperBot.writeInputToOutputStream(outputStream, new FileInputStream(testFile), boundary);
     outputStream.close();
 
     String expectedOutputStart =
         "--boundary\r\n"
-            + "Content-Disposition: form-data; name=\"file\"; filename=\"testfile.txt\"\r\n"
+            + "Content-Disposition: form-data; name=\"file\"; filename="
+            + "\""
+            + AudioRecorder.filePath
+            + "\"\r\n"
             + "Content-Type: audio/mpeg\r\n\r\n";
 
     // Verify the file content
@@ -80,41 +84,38 @@ public class WhisperTest {
     HttpURLConnection mockConnection = new MockHttpURLConnection(responseStream);
 
     // Create an instance of WhisperBot and invoke the method
-    WhisperBot childWhisperer = new WhisperBot();
-    childWhisperer.handleSuccessResponse(mockConnection);
+    WhisperBot whisperer = new WhisperBot();
+    assertEquals("Hello", whisperer.handleSuccessResponse(mockConnection));
+  }
+}
 
-    // Check if the 'output' field is set correctly
-    assertEquals("Hello", childWhisperer.getOutput());
+// A simple mock for HttpURLConnection to provide a predefined response stream
+class MockHttpURLConnection extends HttpURLConnection {
+  private final InputStream responseStream;
+
+  protected MockHttpURLConnection(InputStream responseStream) {
+    super(null);
+    this.responseStream = responseStream;
   }
 
-  // A simple mock for HttpURLConnection to provide a predefined response stream
-  private static class MockHttpURLConnection extends HttpURLConnection {
-    private final ByteArrayInputStream responseStream;
+  @Override
+  public void disconnect() {}
 
-    protected MockHttpURLConnection(ByteArrayInputStream responseStream) {
-      super(null);
-      this.responseStream = responseStream;
-    }
+  @Override
+  public boolean usingProxy() {
+    return false;
+  }
 
-    @Override
-    public void disconnect() {}
+  @Override
+  public void connect() throws IOException {}
 
-    @Override
-    public boolean usingProxy() {
-      return false;
-    }
+  @Override
+  public int getResponseCode() throws IOException {
+    return 200; // Simulate a successful response
+  }
 
-    @Override
-    public void connect() throws IOException {}
-
-    @Override
-    public int getResponseCode() throws IOException {
-      return 200; // Simulate a successful response
-    }
-
-    @Override
-    public InputStream getInputStream() throws IOException {
-      return responseStream;
-    }
+  @Override
+  public InputStream getInputStream() throws IOException {
+    return responseStream;
   }
 }

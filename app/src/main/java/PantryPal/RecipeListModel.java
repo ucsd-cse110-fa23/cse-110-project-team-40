@@ -33,9 +33,15 @@ public class RecipeListModel {
     }
   }
 
+  public List<Recipe> getMealTypeRecipeList(String mealtype) {
+    httpModel.performRequest("POST", mealtype, null);
+    List<Recipe> recipeList = getRecipeList();
+    httpModel.performRequest("DELETE", null, null);
+    return recipeList;
+  }
+
   /** convert JSON response into List of strings */
   public List<Recipe> processResponse(String response) throws IllegalArgumentException {
-    System.out.println("LOOK HERE!! " + response);
     try {
       JSONObject json = new JSONObject(response);
       List<Recipe> recipes = new ArrayList<Recipe>();
