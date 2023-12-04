@@ -11,6 +11,21 @@ public class MockHttpModel implements HttpModel {
   public InputStream in;
 
   @Override
+  public void registerObserver(ServerObserver observer) {
+    // Mock
+  }
+
+  @Override
+  public void removeObserver(ServerObserver observer) {
+    // Mock
+  }
+
+  @Override
+  public void notifyServerStatus(boolean connected) {
+    // Mock
+  }
+
+  @Override
   public boolean tryConnect() {
     // Mock constuctor
     return false;
